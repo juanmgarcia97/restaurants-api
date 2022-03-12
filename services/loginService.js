@@ -1,6 +1,7 @@
 // const { getClient } = require("../config/getClient");
 const md5 = require("md5");
-const user = require("../models/userModel")
+const user = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res, next) => {
   const { username, password } = req.body;
@@ -25,35 +26,44 @@ exports.register = async (req, res, next) => {
   //       e,
   //     });
   //   });
-  let message = ""
-  let status = 0
-  let success = false
-  user.findOne({username: username}, (err, doc) => {
-    if(err) {
-      message = "Internal error"
-      status = 500
-      success = false
+  let message = "";
+  let status = 0;
+  let success = false;
+  user.findOne({ username: username }, (err, doc) => {
+    if (err) {
+      message = "Internal error";
+      status = 500;
+      success = false;
     }
-    if(doc) {
-      message = "Username already exists"
-      status = 409
-      success = false
+    if (doc) {
+      message = "Username already exists";
+      status = 409;
+      success = false;
     } else {
-      doc.password = hashPwd
-      doc.save(error => {
-        if(error) {
-          message = "Something happened, try again later"
-          status = 500
-          success = false
+      doc.password = hashPwd;
+      doc.save((error) => {
+        if (error) {
+          message = "Something happened, try again later";
+          status = 500;
+          success = false;
         }
-        status = 201
-        message = "User created successfully"
-        success = true
-      })
+        status = 201;
+        message = "User created successfully";
+        success = true;
+      });
     }
     res.status(status).send({
       message,
       success,
-    })
-  })
+    });
+  });
+};
+
+exports.login = (req, res, next) => {
+  const user = req.body;
+  jwt.sign({ user }, "secretkey", (err, token) => {
+    res.json({
+      token,
+    });
+  });
 };
