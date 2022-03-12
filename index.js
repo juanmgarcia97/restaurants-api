@@ -6,7 +6,7 @@ const app = express();
 
 let port = process.env.PORT || 3000;
 
-// const db = require("./config/database");
+const db = require("./config/mongoose");
 
 app.use(json());
 routerApi(app);
