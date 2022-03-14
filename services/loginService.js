@@ -1,69 +1,61 @@
-// const { getClient } = require("../config/getClient");
+const db = require("../config");
 const md5 = require("md5");
-const user = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const boom = require("@hapi/boom");
 
 exports.register = async (req, res, next) => {
   const { username, password } = req.body;
   const hashPwd = md5(password);
-  // const client = await getClient()
-  // client
-  //   .query("INSERT INTO users (username, password) VALUES ($1, $2)", [
-  //     username,
-  //     password,
-  //   ])
-  //   .then((result) => {
-  //     result = result.rows[0];
-  //     res.status(200).send({
-  //       isSuccess: true,
-  //       message: "User register successfully",
-  //       body: { username: result.username, password: result.password },
-  //     });
-  //   })
-  //     await client.end()
-  //   .catch((e) => {
-  //     res.status(500).send({
-  //       e,
-  //     });
-  //   });
-  let message = "";
-  let status = 0;
-  let success = false;
-  user.findOne({ username: username }, (err, doc) => {
-    if (err) {
-      message = "Internal error";
-      status = 500;
-      success = false;
-    }
-    if (doc) {
-      message = "Username already exists";
-      status = 409;
-      success = false;
-    } else {
-      doc.password = hashPwd;
-      doc.save((error) => {
-        if (error) {
-          message = "Something happened, try again later";
-          status = 500;
-          success = false;
+  let user = [];
+  await db
+    .query("SELECT * FROM users WHERE username = $1", [username])
+    .then(async (result) => {
+      user = result.rows;
+      if (user.length > 0) {
+        throw boom.conflict("Username already exists");
+      }
+      await db.query(
+        "INSERT INTO users (username, password) VALUES ($1, $2)",
+        [username, hashPwd],
+        (err, result) => {
+          if (err) {
+            return next(err);
+          }
+
+          res.status(201).send({
+            isSuccess: true,
+            message: "User register successfully",
+            body: { username, password },
+          });
         }
-        status = 201;
-        message = "User created successfully";
-        success = true;
-      });
-    }
-    res.status(status).send({
-      message,
-      success,
+      );
+    })
+    .catch((e) => {
+      next(e);
     });
-  });
 };
 
-exports.login = (req, res, next) => {
-  const user = req.body;
-  jwt.sign({ user }, "secretkey", (err, token) => {
-    res.json({
-      token,
+exports.login = async (req, res, next) => {
+  let user = {};
+  await db
+    .query(
+      "SELECT username, password FROM users WHERE username = $1 AND password = $2",
+      [req.body.username, md5(req.body.password)]
+    )
+    .then((result) => {
+      const data = result.rows;
+      if (data.length === 0) {
+        throw boom.notFound("User not found");
+      }
+      user = data[0];
+        user = req.body;
+        jwt.sign({ user }, "secretkey", (err, token) => {
+            res.json({
+                token,
+            });
+        });
+    })
+    .catch((e) => {
+      next(e);
     });
-  });
 };

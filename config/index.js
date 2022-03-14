@@ -1,6 +1,6 @@
 const { Pool } = require('pg')
 
-const connectionString = 'postgresql://tyba:root@172.18.0.3:5432/restaurants-api'
+const connectionString = 'postgresql://postgres:juanmar1709@localhost:5433/restaurants-api'
 
 const pool = new Pool({
     connectionString
@@ -11,5 +11,7 @@ pool.on("connect", () => {
 });
 
 module.exports = {
-    query: (text, params) => pool.query(text, params),
+    query: (text, params, callback) => {
+        return pool.query(text, params, callback)
+    },
 }

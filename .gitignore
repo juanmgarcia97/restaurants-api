@@ -2,3 +2,4 @@
 .idea
 postgres_data
 secrets.js
+.env
