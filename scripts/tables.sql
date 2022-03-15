@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS restaurants;
+DROP TABLE IF EXISTS restaurants_user;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users(
@@ -7,13 +7,12 @@ CREATE TABLE users(
 	"password" VARCHAR(36) NOT NULL
 );
 
-CREATE TABLE restaurants(
-    "restaurant_id" SERIAL PRIMARY KEY,
-    "name" VARCHAR(25) NOT NULL,
-    "rating" NUMERIC(1,1) NOT NULL,
-    "address" VARCHAR(50) NOT NULL,
+CREATE TABLE restaurants_user(
+    "restaurant_user_id" SERIAL PRIMARY KEY,
     "user_id" INTEGER NOT NULL,
-    CONSTRAINT "fk_restaurant_user"
+    "restaurants" JSONB,
+    "date" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT "fk_restaurants_user_user"
             FOREIGN KEY("user_id")
             REFERENCES users("user_id")
             ON DELETE NO ACTION

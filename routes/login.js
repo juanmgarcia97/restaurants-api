@@ -5,12 +5,16 @@ const validatorHandler = require("../middlewares/validatorHandler");
 const userDTO = require("../dtos/userDTO")
 
 
-router.post("/register", (req, res, next) => {
-    loginService.register(req, res, next)
+router.post("/register", async (req, res, next) => {
+    await loginService.register(req, res, next)
 })
 
-router.post("/", validatorHandler(userDTO, "body"), (req, res, next) => {
-    loginService.login(req, res, next)
+router.post("/login", validatorHandler(userDTO, "body"), async (req, res, next) => {
+    await loginService.login(req, res, next)
+})
+
+router.put("/logout", (req, res, next) => {
+    loginService.logout(req, res, next)
 })
 
 module.exports = router

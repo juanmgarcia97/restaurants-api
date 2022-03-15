@@ -1,9 +1,13 @@
 const { Pool } = require('pg')
 
-const connectionString = 'postgresql://postgres:juanmar1709@localhost:5433/restaurants-api'
+// const connectionString = 'postgresql://postgres:juanmar1709@localhost:5433/restaurants-api'
 
 const pool = new Pool({
-    connectionString
+    user: 'postgres',
+    host: 'localhost',
+    database: 'restaurants-api',
+    password: 'juanmar1709',
+    port: 5433,
 })
 
 pool.on("connect", () => {
