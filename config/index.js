@@ -1,17 +1,18 @@
 const { Pool } = require('pg')
+const dotenv = require("dotenv")
 
-// const connectionString = 'postgresql://postgres:juanmar1709@localhost:5433/restaurants-api'
+dotenv.config()
 
 const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'restaurants-api',
-    password: 'juanmar1709',
-    port: 5433,
+    user: process.env.DATABASE_PG_USER,
+    host: process.env.DATABASE_PG_HOST,
+    database: process.env.DATABASE_PG_DB,
+    password: process.env.DATABASE_PG_PWD,
+    port: process.env.DATABASE_PG_PORT,
 })
 
 pool.on("connect", () => {
-    console.log("connected to the Database");
+    console.log("connected to the database");
 });
 
 module.exports = {
